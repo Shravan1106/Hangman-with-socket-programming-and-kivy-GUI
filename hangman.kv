@@ -1,0 +1,278 @@
+#: kivy 1.9.1
+
+<HangmanBoard>:
+    # Background
+    canvas:
+        Color:
+            rgba: app.BACKGROUND_COLOR
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    # Border Lines
+        Color:
+            rgba: app.BORDER_LINE_COLOR
+        # Horizontal lines
+        Line:
+            points: app.OM, app.OM, root.width - app.OM, app.OM
+        Line:
+            points: app.IM, app.IM, root.width - app.IM, app.IM
+        Line:
+            points:
+                app.OM, root.top - app.OM, \
+                root.width - app.OM, root.top - app.OM
+        Line:
+            points:
+                app.IM, root.top - app.IM, \
+                root.width - app.IM, root.top - app.IM
+
+        # Vertical lines
+        Line:
+            points: app.OM, app.OM, app.OM, root.top - app.OM
+        Line:
+            points: app.IM, app.IM, app.IM, root.top - app.IM
+        Line:
+            points:
+                root.width - app.OM, app.OM, \
+                root.width - app.OM, root.height - app.OM
+        Line:
+            points:
+                root.width - app.IM, app.IM, \
+                root.width - app.IM, root.height - app.IM
+
+    # Area of the HangmanBoard inside the border lines.
+    BoxLayout:
+        orientation: 'vertical'
+        size_hint_x: (root.width - 2 * (app.IM + 1)) / root.width
+        size_hint_y: (root.height - 2 * (app.IM + 1)) / root.height
+
+        # Holds the category of the word and new game button.
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: 0.1
+            Button:
+                size_hint_x: 0.1
+            Button:
+                id: category
+                size_hint_x: 0.8
+                bold: True
+            Button:
+                size_hint_x: 0.1
+                on_press: root.new_game()
+                Image:
+                    source: 'icon.png'
+                    y: self.parent.y
+                    x: self.parent.x
+                    size: self.parent.size
+
+        # Contains the hangman gallows and the hangman body.
+        Widget:
+            id: gallows
+            size_hint_y: 0.4
+            canvas:
+                Color:
+                    rgba: app.GALLOW_COLLOR
+                # Base
+                Line:
+                    width: 2
+                    points:
+                        self.pos[0] + 5, self.pos[1] + 2, \
+                        self.pos[0] + self.width - 5, self.pos[1] + 2
+                # Pole
+                Line:
+                    width: 2
+                    points:
+                        self.pos[0] + self.width * (2 / 3), self.pos[1], \
+                        self.pos[0] + self.width * (2 / 3), self.pos[1] + self.height
+                # Diagonal
+                Line:
+                    width: 2
+                    points:
+                        self.pos[0] + self.width * (5 / 9), self.pos[1], \
+                        self.pos[0] + self.width * (2 / 3), self.pos[1] + self.height * (1 / 6)
+                # Top
+                Line:
+                    width: 2
+                    points:
+                        self.pos[0] + self.width * (2 / 3), self.pos[1] + self.height, \
+                        self.pos[0] + self.width * (4 / 9), self.pos[1] + self.height
+                # Rope
+                Line:
+                    width: 2
+                    points:
+                        self.pos[0] + self.width * (4 / 9), self.pos[1] + self.height, \
+                        self.pos[0] + self.width * (4 / 9), self.pos[1] + self.height * (5 / 6)
+
+
+                Color:
+                    group: 'body'
+                    rgba: app.BODY_COLOR
+                # Head
+                Line:
+                    width: 2
+                    circle:
+                        self.pos[0] + self.width * (4 / 9), self.pos[1] + self.height * (9 / 12), \
+                        self.height * (1 / 12)
+                Color:
+                    group: 'body'
+                    rgba: app.BODY_COLOR
+                # Body
+                Line:
+                    width: 2
+                    points:
+                        self.pos[0] + self.width * (4 / 9), self.pos[1] + self.height * (8 / 12), \
+                        self.pos[0] + self.width * (4 / 9), self.pos[1] + self.height * (4 / 12)
+                Color:
+                    group: 'body'
+                    rgba: app.BODY_COLOR
+                # Arms
+                Line:
+                    width: 2
+                    points:
+                        self.pos[0] + self.width * (7 / 18), self.pos[1] + self.height * (13 / 24), \
+                        self.pos[0] + self.width * (4 / 9), self.pos[1] + self.height * (15 / 24), \
+                        self.pos[0] + self.width * (9 / 18), self.pos[1] + self.height * (13 / 24)
+                Color:
+                    group: 'body'
+                    rgba: app.BODY_COLOR
+                # Legs
+                Line:
+                    width: 2
+                    points:
+                        self.pos[0] + self.width * (7 / 18), self.pos[1] + self.height * (2 / 12), \
+                        self.pos[0] + self.width * (4 / 9), self.pos[1] + self.height * (4 / 12), \
+                        self.pos[0] + self.width * (9 / 18), self.pos[1] + self.height * (2 / 12)
+
+
+        # Contains the hidden word to be guessed and updated with correct answers.
+        Button:
+            id: hidden
+            size_hint_y: 0.2
+            text_size: self.size
+
+        # Grid of all the letters in the alphabet.
+        GridLayout:
+            cols: 10
+            size_hint_y: 0.3
+            pos_hint: {'center_x': 0.5}
+            Button:
+                id: letterA
+                text: 'A'
+                on_press: root.letter_click(self)
+            Button:
+                id: letterB
+                text: 'B'
+                on_press: root.letter_click(self)
+            Button:
+                id: letterC
+                text: 'C'
+                on_press: root.letter_click(self)
+            Button:
+                id: letterD
+                text: 'D'
+                on_press: root.letter_click(self)
+            Button:
+                id: letterE
+                text: 'E'
+                on_press: root.letter_click(self)
+            Button:
+                id: letterF
+                text: 'F'
+                on_press: root.letter_click(self)
+            Button:
+                id: letterG
+                text: 'G'
+                on_press: root.letter_click(self)
+            Button:
+                id: letterH
+                text: 'H'
+                on_press: root.letter_click(self)
+            Button:
+                id: letterI
+                text: 'I'
+                on_press: root.letter_click(self)
+            Button:
+                id: letterJ
+                text: 'J'
+                on_press: root.letter_click(self)
+            Button:
+                id: letterK
+                text: 'K'
+                on_press: root.letter_click(self)
+            Button:
+                id: letterL
+                text: 'L'
+                on_press: root.letter_click(self)
+            Button:
+                id: letterM
+                text: 'M'
+                on_press: root.letter_click(self)
+            Button:
+                id: letterN
+                text: 'N'
+                on_press: root.letter_click(self)
+            Button:
+                id: letterO
+                text: 'O'
+                on_press: root.letter_click(self)
+            Button:
+                id: letterP
+                text: 'P'
+                on_press: root.letter_click(self)
+            Button:
+                id: letterQ
+                text: 'Q'
+                on_press: root.letter_click(self)
+            Button:
+                id: letterR
+                text: 'R'
+                on_press: root.letter_click(self)
+            Button:
+                id: letterS
+                text: 'S'
+                on_press: root.letter_click(self)
+            Button:
+                id: letterT
+                text: 'T'
+                on_press: root.letter_click(self)
+            # Space holders for the left side of the bottom row of letters.
+            Button:
+            Button:
+            Button:
+                id: letterU
+                text: 'U'
+                on_press: root.letter_click(self)
+            Button:
+                id: letterV
+                text: 'V'
+                on_press: root.letter_click(self)
+            Button:
+                id: letterW
+                text: 'W'
+                on_press: root.letter_click(self)
+            Button:
+                id: letterX
+                text: 'X'
+                on_press: root.letter_click(self)
+            Button:
+                id: letterY
+                text: 'Y'
+                on_press: root.letter_click(self)
+            Button:
+                id: letterZ
+                text: 'Z'
+                on_press: root.letter_click(self)
+            # Space holders for the right side of the bottom row of letters.
+            Button:
+            Button:
+
+# Button class to automatically adjust attributes of all buttons.
+<Button>:
+    background_normal: ''
+    background_down: ''
+    background_disabled_normal: ''
+    background_color: app.BACKGROUND_COLOR
+    pos_hint: {'center_x': 0.5}
+    halign: 'center'
+    valign: 'top'
+    font_size: 40
